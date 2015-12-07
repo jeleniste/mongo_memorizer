@@ -236,13 +236,15 @@ class mongolizer_layer:
         self.collection = self.db[
                 self.dockwidget.input_vyber_collection.currentText()]
 
+        self.dockwidget.nahraj_vrstvu.setEnabled(True)
+
     def mongo_memorize_execute(self):
         """run transfer of mongo collection, or query into
         memory layer and add it into the layer registry"""
         #option 1
         query = json.loads(self.dockwidget.input_query.toPlainText())
 
-        self.dockwidget.progressBar.setRange(0
+        self.dockwidget.progressBar.setRange(1
                 , self.collection.find(query).count())
 
         self.mongo_memorize(
@@ -288,7 +290,7 @@ class mongolizer_layer:
         self.dockwidget.input_database_name.currentIndexChanged.connect(
                 self.populate_input_vyber_collection)
 
-        self.dockwidget.input_vyber_collection.activated.connect(
+        self.dockwidget.input_vyber_collection.currentIndexChanged.connect(
                 self.select_collection)
 
         self.dockwidget.nahraj_vrstvu.clicked.connect(
@@ -312,7 +314,8 @@ class mongolizer_layer:
             , geomcolname = 'geometry'
             , host = 'localhost'
             , port = 27017
-            , srid = 4326):
+            #, srid = 4326
+            ):
         """Konstruktor
         vytvoří memory vrstvu z kolekce geojsonů v mongodb
         počítá s mongem na localhostu
@@ -340,6 +343,9 @@ class mongolizer_layer:
 
         #geomcolname
         geomcolname = self.dockwidget.input_geom_coll.text()
+
+        #srid
+        srid = self.dockwidget.input_srid.text()
         
         #Stahnu vzorovej zaznam
         mustr = collection.find_one({geomcolname:{'$exists':1}})
@@ -360,14 +366,15 @@ class mongolizer_layer:
         #definuju atributy
         pr.addAttributes(
             #ogc_fid    
-            [QgsField('ogc_fid',QVariant.LongLong)]
+            [QgsField('ogc_fid',QVariant.Double, typeName = 'numeric', len = 10)] #LongLong have not proper length
+            #double taky ne, je treba pouzit def na numeric viz na dalsich mistech
             #tagy z mustr.proprty
             + [QgsField(k
                 , 
                 #mongolizer_layer.qgs_attrtypedef(v)
                 (lambda i:
                     QVariant.Int if type(i) is int
-                    else QVariant.LongLong if type(i) is bson.int64.Int64
+                    else QVariant.LongLong if type(i) is bson.int64.Int64 #nemusi se vejit do lonlong, melo by bejt number
                     else QVariant.Double if type(i) is float
                     else QVariant.String if type(i) is dict #string co pude do jsona
                     else QVariant.String if type(i) is list #string co pude do jsona

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>295</width>
-    <height>362</height>
+    <width>302</width>
+    <height>410</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -93,7 +93,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit">
+         <widget class="QLineEdit" name="input_srid">
           <property name="text">
            <string>4326</string>
           </property>
@@ -107,6 +107,16 @@
          </widget>
         </item>
         <item>
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>limit</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="input_limit"/>
+        </item>
+        <item>
          <widget class="Line" name="line">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -115,6 +125,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="nahraj_vrstvu">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="maximumSize">
            <size>
             <width>304</width>
