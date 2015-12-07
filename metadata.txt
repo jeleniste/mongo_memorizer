@@ -1,0 +1,39 @@
+# This file contains metadata for your plugin. Since 
+# version 2.0 of QGIS this is the proper way to supply 
+# information about a plugin. The old method of 
+# embedding metadata in __init__.py will 
+# is no longer supported since version 2.0.
+
+# This file should be included when you package your plugin.# Mandatory items:
+
+[general]
+name=mongoloid
+qgisMinimumVersion=2.10
+description=create memory layer from geojsons stored in mongo
+version=0.1
+author=Jelen
+email=godzilalalala@gmail.com
+
+about=Create memory layer from collection in mongo database, is able to get subset of data using mongo query. Objects in collection should have the same geometry type. All nodes in properties are handled. Nested properties are handed as geojson.
+
+tracker=placeholder_bug_tracker
+repository=placeholder_repository
+# End of mandatory metadata
+
+# Recommended items:
+
+# Uncomment the following line and add your changelog:
+# changelog=
+
+# Tags are comma separated with spaces allowed
+tags=geojson, mongo, mongodb
+
+homepage=http://www.gismentors.cz/mentors/michalek/
+category=Database
+icon=icon.png
+# experimental flag
+experimental=False
+
+# deprecated flag (applies to the whole plugin, not just a single version)
+deprecated=False
+
