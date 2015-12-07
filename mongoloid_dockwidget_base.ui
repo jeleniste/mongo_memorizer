@@ -135,7 +135,7 @@
            </size>
           </property>
           <property name="text">
-           <string>nahraj vrstvu</string>
+           <string>run</string>
           </property>
          </widget>
         </item>
