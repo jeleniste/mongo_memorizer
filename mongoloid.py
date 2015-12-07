@@ -38,6 +38,7 @@ import re
 import qgis.utils
 from qgis.core import *
 import bson
+from types import NoneType
 
 #from dateutil.parser import parse as dateparse
 
@@ -369,12 +370,13 @@ class mongolizer_layer:
                     else QVariant.LongLong if type(i) is bson.int64.Int64
                     else QVariant.Double if type(i) is float
                     else QVariant.String if type(i) is dict #string co pude do jsona
+                    else QVariant.String if type(i) is list #string co pude do jsona
                     else QVariant.Date if re.match(isisodate, i)
                     else QVariant.String
                     )(v)
                 
                 ) 
-                for k,v in mustr['properties'].iteritems()]
+                for k,v in mustr['properties'].iteritems() if type(v) is not NoneType]
         )
 
         #aktualizuju definici vrstvy
@@ -385,7 +387,7 @@ class mongolizer_layer:
             fet = QgsFeature()
 
             #test, esli ma prvek geometrii
-            if  geomcolname in i:
+            if  geomcolname in i and type(i[geomcolname]) is not NoneType:
                 #pridam geometrii
                 fet.setGeometry(
                         QgsGeometry.fromWkt(
@@ -412,13 +414,14 @@ class mongolizer_layer:
                             QVariant.Int if type(i) is int
                             else QVariant.Double if type(i) is float
                             else QVariant.String if type(i) is dict #string co pude do jsona
+                            else QVariant.String if type(i) is list #string co pude do jsona
                             else QVariant.LongLong if type(i) is bson.int64.Int64
                             else QVariant.Date if re.match(isisodate, i)
                             else QVariant.String
                             )(v)
                         
                         ) 
-                        for k,v in missing_cols.iteritems()]
+                        for k,v in missing_cols.iteritems() if type(v) is not NoneType]
                 )
 
                 #aktualizuju definici vrstvy
@@ -427,7 +430,7 @@ class mongolizer_layer:
             #naplnim atributy
             fet.setAttributes(
                 map(lambda a: 
-                    json.dumps(a, ensure_ascii=False) if type(a) is dict 
+                    json.dumps(a, ensure_ascii=False) if (type(a) is dict or type(a) is list)
                     else a,
                     (
                         [i['_id']] #ogc_fid
