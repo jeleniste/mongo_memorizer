@@ -100,7 +100,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="checkBox">
+         <widget class="QCheckBox" name="input_canvas_filter">
           <property name="text">
            <string>filter by map window</string>
           </property>

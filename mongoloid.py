@@ -367,6 +367,18 @@ class mongolizer_layer:
         #geomcolname
         geomcolname = self.dockwidget.input_geom_coll.text()
 
+        #extent
+        #ogr.CreateGeometryFromWkt(iface.mapCanvas().extent().asWktPolygon()).ExportToJson()
+        #db.Parcely.find({geometry:{$geoIntersects:{$geometry:j}}})
+
+        if self.dockwidget.input_canvas_filter.checkState():
+            spatial_query = {"$geoIntersects":
+                {"$geometry":
+                    json.loads(ogr.CreateGeometryFromWkt(self.iface.mapCanvas().extent().asWktPolygon()).ExportToJson())
+                }
+            }
+            query[geomcolname] = spatial_query
+
         #srid
         srid = self.dockwidget.input_srid.text()
         
@@ -415,6 +427,9 @@ class mongolizer_layer:
         #limit
         limit = self.dockwidget.input_limit.text()
         cur = (collection.find(query) if limit == '' else collection.find(query).limit(int(limit)))
+
+        self.dockwidget.progressBar.setRange(1
+                , self.collection.find(query).count())
 
         for i in cur:
             #vytvorim prvok
