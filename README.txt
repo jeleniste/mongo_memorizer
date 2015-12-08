@@ -65,4 +65,3 @@ import of sample data:
 In this version dont work:
    filter by map window
    mongodb connect options
-   try query

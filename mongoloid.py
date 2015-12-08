@@ -41,7 +41,8 @@ import bson
 from types import NoneType
 
 ##
-from qgis.gui import QgsMessageBar
+##from qgis.gui import QgsMessageBar
+from PyQt4.QtGui import QDialog, QMessageBox
 
 #from dateutil.parser import parse as dateparse
 
@@ -259,20 +260,16 @@ class mongolizer_layer:
 
     def try_query(self):
 
-        self.dockwidget.bar = QgsMessageBar()
-
         query = self.dockwidget.input_query.toPlainText()
 
         try:
-            count = collection.find(query).count()
-            self.dockwidget.bar.pushMessage("Valid query"
-                    , "Current query returns %s features"%count
-                    , level=QgsMessageBar.INFO)
+            count = self.collection.find(json.loads(query)).count()
+            QMessageBox.information(QDialog()
+                    , "Query is Valid", "Current query returns %s features"%count)
 
         except:
-            self.dockwidget.bar.pushMessage("Error"
-                    , "this query is probably invalid"
-                    , level=QgsMessageBar.CRITICAL)
+            QMessageBox.critical(QDialog()
+                    ,"Invalid Query","This querry is probably invalid")
 
 
 
@@ -319,8 +316,8 @@ class mongolizer_layer:
                 self.mongo_memorize_execute)
 
         #zlobi, widget i logika
-        #self.dockwidget.input_try_query.clicked.connect(
-        #        self.try_query)
+        self.dockwidget.input_try_query.clicked.connect(
+                self.try_query)
 
 
 
