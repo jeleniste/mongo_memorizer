@@ -158,11 +158,18 @@
        <attribute name="title">
         <string>Query</string>
        </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <widget class="QPlainTextEdit" name="input_query">
           <property name="plainText">
            <string>{}</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="input_try_query">
+          <property name="text">
+           <string>Try</string>
           </property>
          </widget>
         </item>

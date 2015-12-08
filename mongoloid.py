@@ -389,7 +389,11 @@ class mongolizer_layer:
         #aktualizuju definici vrstvy
         self.vl.updateFields() 
 
-        for i in collection.find(query):
+        #limit
+        limit = self.dockwidget.input_limit.text()
+        cur = (collection.find(query) if limit == '' else collection.find(query).limit(int(limit)))
+
+        for i in cur:
             #vytvorim prvok
             fet = QgsFeature()
 
