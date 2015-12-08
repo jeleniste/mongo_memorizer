@@ -64,5 +64,5 @@ import of sample data:
 
 In this version dont work:
    filter by map window
-   limit
    mongodb connect options
+   try query

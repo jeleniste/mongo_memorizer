@@ -40,6 +40,9 @@ from qgis.core import *
 import bson
 from types import NoneType
 
+##
+from qgis.gui import QgsMessageBar
+
 #from dateutil.parser import parse as dateparse
 
 
@@ -254,6 +257,25 @@ class mongolizer_layer:
         QgsMapLayerRegistry.instance().addMapLayer(self.vl)
     #--------------------------------------------------------------------------
 
+    def try_query(self):
+
+        self.dockwidget.bar = QgsMessageBar()
+
+        query = self.dockwidget.input_query.toPlainText()
+
+        try:
+            count = collection.find(query).count()
+            self.dockwidget.bar.pushMessage("Valid query"
+                    , "Current query returns %s features"%count
+                    , level=QgsMessageBar.INFO)
+
+        except:
+            self.dockwidget.bar.pushMessage("Error"
+                    , "this query is probably invalid"
+                    , level=QgsMessageBar.CRITICAL)
+
+
+
     def run(self):
         """Run method that loads and starts the plugin"""
 
@@ -295,6 +317,10 @@ class mongolizer_layer:
 
         self.dockwidget.nahraj_vrstvu.clicked.connect(
                 self.mongo_memorize_execute)
+
+        #zlobi, widget i logika
+        #self.dockwidget.input_try_query.clicked.connect(
+        #        self.try_query)
 
 
 
