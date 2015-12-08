@@ -401,7 +401,7 @@ class mongolizer_layer:
         #definuju atributy
         pr.addAttributes(
             #ogc_fid    
-            [QgsField('ogc_fid',QVariant.Double, typeName = 'numeric', len = 10)] #LongLong have not proper length
+            [QgsField('ogc_fid',QVariant.LongLong)] #LongLong have not proper length
             #double taky ne, je treba pouzit def na numeric viz na dalsich mistech
             #tagy z mustr.proprty
             + [QgsField(k
@@ -480,9 +480,10 @@ class mongolizer_layer:
             fet.setAttributes(
                 map(lambda a: 
                     json.dumps(a, ensure_ascii=False) if (type(a) is dict or type(a) is list)
+                    else int(a) if type(a) is bson.int64.Int64
                     else a,
                     (
-                        [i['_id']] #ogc_fid
+                        [int(i['_id'])] #ogc_fid
                         #proprty z mustru
                         + [i['properties'][field.name()] 
                             if field.name() in i['properties'] else None

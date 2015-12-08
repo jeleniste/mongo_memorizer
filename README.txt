@@ -64,4 +64,3 @@ import of sample data:
 
 In this version dont work:
    mongodb connect options
-   log numeric items aren`t load correctly
