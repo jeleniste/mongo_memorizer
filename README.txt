@@ -2,7 +2,7 @@ qgis plugin for create memory layer from geojsons stored in mongodb
 Geojson should like in this fashion
 
 import of sample data:
-   mongoimport --db mongoloid --collection Parcely --drop --file sample.json
+   mongoimport --db mongo_memorizer --collection Parcely --drop --file sample.json
 
 {
 	"_id" : NumberLong("31525565010"),

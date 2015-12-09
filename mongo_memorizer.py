@@ -26,7 +26,7 @@ from PyQt4.QtGui import QAction, QIcon
 import resources
 
 # Import the code for the DockWidget
-from mongoloid_dockwidget import mongolizer_layerDockWidget
+from mongo_memorizer_dockwidget import mongolizer_layerDockWidget
 import os.path
 
 ##
@@ -80,7 +80,7 @@ class mongolizer_layer:
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&mongoloid')
+        self.menu = self.tr(u'&mongo_memorizer')
         # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'mongolizer_layer')
         self.toolbar.setObjectName(u'mongolizer_layer')
@@ -188,7 +188,7 @@ class mongolizer_layer:
         icon_path = ':/plugins/mongolizer_layer/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u'mongoloid'),
+            text=self.tr(u'mongo_memorizer'),
             callback=self.run,
             parent=self.iface.mainWindow())
 
@@ -218,7 +218,7 @@ class mongolizer_layer:
 
         for action in self.actions:
             self.iface.removePluginDatabaseMenu(
-                self.tr(u'&mongoloid'),
+                self.tr(u'&mongo_memorizer'),
                 action)
             self.iface.removeToolBarIcon(action)
         # remove the toolbar

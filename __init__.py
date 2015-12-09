@@ -31,5 +31,5 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :type iface: QgsInterface
     """
     #
-    from .mongoloid import mongolizer_layer
+    from .mongo_memorizer import mongolizer_layer
     return mongolizer_layer(iface)

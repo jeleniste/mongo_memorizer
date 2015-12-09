@@ -38,15 +38,15 @@ LOCALES =
 # translation
 SOURCES = \
 	__init__.py \
-	mongoloid.py mongoloid_dockwidget.py
+	mongo_memorizer.py mongo_memorizer_dockwidget.py
 
 PLUGINNAME = mongolizer_layer
 
 PY_FILES = \
 	__init__.py \
-	mongoloid.py mongoloid_dockwidget.py
+	mongo_memorizer.py mongo_memorizer_dockwidget.py
 
-UI_FILES = mongoloid_dockwidget_base.ui
+UI_FILES = mongo_memorizer_dockwidget_base.ui
 
 EXTRAS = metadata.txt icon.png
 

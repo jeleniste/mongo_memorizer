@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>mongoloid</string>
+   <string>mongo_memorizer</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QHBoxLayout" name="horizontalLayout">

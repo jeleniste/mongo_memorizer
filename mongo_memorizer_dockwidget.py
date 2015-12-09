@@ -27,7 +27,7 @@ from PyQt4 import QtGui, uic
 from PyQt4.QtCore import pyqtSignal
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'mongoloid_dockwidget_base.ui'))
+    os.path.dirname(__file__), 'mongo_memorizer_dockwidget_base.ui'))
 
 
 class mongolizer_layerDockWidget(QtGui.QDockWidget, FORM_CLASS):

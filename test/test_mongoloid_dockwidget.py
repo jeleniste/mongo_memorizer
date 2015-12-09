@@ -16,7 +16,7 @@ import unittest
 
 from PyQt4.QtGui import QDockWidget
 
-from mongoloid_dockwidget import mongolizer_layerDockWidget
+from mongo_memorizer_dockwidget import mongolizer_layerDockWidget
 
 from utilities import get_qgis_app
 

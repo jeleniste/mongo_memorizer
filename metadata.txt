@@ -7,7 +7,7 @@
 # This file should be included when you package your plugin.# Mandatory items:
 
 [general]
-name=mongoloid
+name=mongo_memorizer
 qgisMinimumVersion=2.10
 description=create memory layer from geojsons stored in mongo
 version=0.1
@@ -16,8 +16,8 @@ email=godzilalalala@gmail.com
 
 about=Create memory layer from collection in mongo database, is able to get subset of data using mongo query. Objects in collection should have the same geometry type. All nodes in properties are handled. Nested properties are handled as geojson.
 
-tracker=https://github.com/jeleniste/mongoloid
-repository=https://github.com/jeleniste/mongoloid
+tracker=https://github.com/jeleniste/mongo_memorizer
+repository=https://github.com/jeleniste/mongo_memorizer
 # End of mandatory metadata
 
 # Recommended items:
