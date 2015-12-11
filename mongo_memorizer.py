@@ -486,9 +486,8 @@ class mongolizer_layer:
         except TypeError:
                 QMessageBox.critical(QDialog()
                         , "Missing geometry"
-                        , "First item of collection has no geometry.\n\
-                                Use query like {\"geometry\":{\"$exists\":1}}.\n\
-                                Check number of objects with geometry.")
+                        , "Any of objects in this collection has no geometry\
+                                or geometry isn`t valid")
                 return(None)
 
 
