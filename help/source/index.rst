@@ -11,6 +11,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   mongo_memorizer
+
 Indices and tables
 ==================
 
