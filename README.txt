@@ -63,4 +63,3 @@ import of sample data:
 }
 
 In this version dont work:
-   mongodb connect options
