@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>302</width>
+    <width>298</width>
     <height>410</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
@@ -62,7 +62,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="input_vyber_collection">
+         <widget class="QComboBox" name="input_select_collection">
           <property name="maximumSize">
            <size>
             <width>304</width>
@@ -101,6 +101,9 @@
         </item>
         <item>
          <widget class="QCheckBox" name="input_canvas_filter">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>filter by map window</string>
           </property>
@@ -124,7 +127,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="nahraj_vrstvu">
+         <widget class="QPushButton" name="load_layer">
           <property name="enabled">
            <bool>false</bool>
           </property>
@@ -211,12 +214,46 @@
         <item>
          <widget class="QLabel" name="label_6">
           <property name="text">
-           <string>uri</string>
+           <string>user</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="input_uri"/>
+         <widget class="QLineEdit" name="input_user"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string>password</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="input_password"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_10">
+          <property name="text">
+           <string>authentication database</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="input_auth_db">
+          <property name="text">
+           <string>admin</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_11">
+          <property name="text">
+           <string>authentication method</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="input_auth_method"/>
         </item>
         <item>
          <widget class="Line" name="line_2">
@@ -226,16 +263,9 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="input_connect">
           <property name="text">
-           <string>create uri</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_2">
-          <property name="text">
-           <string>reconnect</string>
+           <string>connect</string>
           </property>
          </widget>
         </item>

@@ -39,10 +39,11 @@ import qgis.utils
 from qgis.core import *
 import bson
 from types import NoneType
+from pymongo import errors as mongoerr
 
 ##
 ##from qgis.gui import QgsMessageBar
-from PyQt4.QtGui import QDialog, QMessageBox
+from PyQt4.QtGui import QDialog, QMessageBox, QInputDialog
 
 #from dateutil.parser import parse as dateparse
 
@@ -224,23 +225,48 @@ class mongolizer_layer:
         # remove the toolbar
         del self.toolbar
 
-    def populate_input_vyber_collection(self):
+    def populate_input_select_collection(self):
         """fill combobox with names from list of collections 
         from actual mongo database"""
 
-        self.dockwidget.input_vyber_collection.clear()
+        self.dockwidget.input_select_collection.clear()
 
         self.db = self.mongocli[
                 self.dockwidget.input_database_name.currentText()]
 
-        self.dockwidget.input_vyber_collection.addItems(
+        self.dockwidget.input_select_collection.addItems(
                 self.db.collection_names())
 
     def select_collection(self):
         self.collection = self.db[
-                self.dockwidget.input_vyber_collection.currentText()]
+                self.dockwidget.input_select_collection.currentText()]
 
-        self.dockwidget.nahraj_vrstvu.setEnabled(True)
+        self.dockwidget.load_layer.setEnabled(True)
+        self.dockwidget.input_canvas_filter.setEnabled(False)
+
+        self.enable_spat_filtr()
+
+
+
+    def enable_spat_filtr(self):
+        """try if is posible filter layer by geometry intersection"""
+
+        geomcolname = self.dockwidget.input_geom_coll.text()
+        try:
+            #enable spat filter
+            spatial_query = {"$geoIntersects":
+                {"$geometry":
+                    json.loads(ogr.CreateGeometryFromWkt(
+                        self.iface.mapCanvas().extent().asWktPolygon()).ExportToJson())
+                }
+            }
+            self.collection.find_one({geomcolname : spatial_query})
+            self.dockwidget.input_canvas_filter.setEnabled(True)
+        except: 
+            self.dockwidget.input_canvas_filter.setEnabled(False)
+            QMessageBox.critical(QDialog()
+                    , "eee", "eeeeee")
+
 
     def mongo_memorize_execute(self):
         """run transfer of mongo collection, or query into
@@ -259,6 +285,8 @@ class mongolizer_layer:
     #--------------------------------------------------------------------------
 
     def try_query(self):
+        """try query if is correct and show number of objects in
+        result"""
 
         query = self.dockwidget.input_query.toPlainText()
 
@@ -271,13 +299,67 @@ class mongolizer_layer:
             QMessageBox.critical(QDialog()
                     ,"Invalid Query","This querry is probably invalid")
 
+    def mongo_connect(self):
+        """create connection and authentize user"""
+        self.user = self.dockwidget.input_user.text()
+        self.password = self.dockwidget.input_password.text()
+        self.auth_db = self.dockwidget.input_auth_db.text()
+        self.host = self.dockwidget.input_host.text()
+        self.port = self.dockwidget.input_port.text()
+        self.pwd = self.dockwidget.input_password.text()
+        self.auth_db = self.dockwidget.input_auth_db.text()
+        self.auth_mechanism = self.dockwidget.input_auth_method.currentText()
+        if self.auth_mechanism == u'':
+            self.auth_mechanism = 'SCRAM-SHA-1'
+
+
+
+
+        try:
+            self.mongocli = MongoClient(self.host, int(self.port)) 
+
+            #authenticate
+            if self.host != "" and self.pwd != "" and self.auth_db != "":
+                 self.mongocli[self.auth_db].authenticate(self.user
+                         , self.pwd
+                         , mechanism = self.auth_mechanism)
+
+            QMessageBox.information(QDialog()
+                    , "Connection", "You are succesfully connected into the db")
+
+            try:
+                self.dockwidget.input_database_name.clear()
+                self.dockwidget.input_database_name.addItems(
+                        self.mongocli.database_names())
+
+            except mongoerr.OperationFailure:
+                QMessageBox.critical(QDialog()
+                        , "Permission error"
+                        , "You user probably have not permission for list databases")
+                
+                self.dockwidget.input_database_name.clear()
+                self.dockwidget.input_database_name.addItems(
+                        [
+                            QInputDialog.getText(QDialog(),"dbname"
+                                , "insert database name")[0]
+                            ]
+                        )
+                self.populate_input_select_collection()
+
+                #Disable run button
+                self.dockwidget.load_layer.setEnabled(False)
+
+
+        except:
+            QMessageBox.critical(QDialog()
+                    ,"Invalid connection","db connection failed")
+
+
 
 
     def run(self):
         """Run method that loads and starts the plugin"""
 
-        #mongo connection
-        self.mongocli = MongoClient() #default, moznost zmenit
 
         if not self.pluginIsActive:
             self.pluginIsActive = True
@@ -299,21 +381,39 @@ class mongolizer_layer:
             self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
 
-        #database_names
-        self.dockwidget.input_database_name.addItems(
-                self.mongocli.database_names())
+        #mongo connection
+        #self.mongocli = MongoClient() #default, moznost zmenit
+
+        #auth mechanisms
+        self.dockwidget.input_auth_method.addItems(
+                [
+                    'SCRAM-SHA-1'
+                    , 'MONGODB-CR'
+                    , 'x.509'
+                    , 'Kerberos'
+                    , 'LDAP'
+                ]
+            )
+
+        #database_names presunout do connect
+        #self.dockwidget.input_database_name.addItems(
+        #        self.mongocli.database_names())
 
         #form actions
         self.dockwidget.progressBar.reset()
 
-        self.dockwidget.input_database_name.currentIndexChanged.connect(
-                self.populate_input_vyber_collection)
+        self.dockwidget.input_database_name.activated.connect(
+                self.populate_input_select_collection)
 
-        self.dockwidget.input_vyber_collection.currentIndexChanged.connect(
+        self.dockwidget.input_select_collection.activated.connect(
                 self.select_collection)
 
-        self.dockwidget.nahraj_vrstvu.clicked.connect(
+        self.dockwidget.load_layer.clicked.connect(
                 self.mongo_memorize_execute)
+
+        #zlobi, widget i logika
+        self.dockwidget.input_connect.clicked.connect(
+                self.mongo_connect)
 
         #zlobi, widget i logika
         self.dockwidget.input_try_query.clicked.connect(
@@ -323,7 +423,7 @@ class mongolizer_layer:
 
 ##------------------------------------
 ##class mongo_memorize(QgsVectorLayer):
-    """vrstva z geojsonu ulozenych v mongu
+    """make memory layer from geojsons stored in mongo
     """
 
     ##def __init__(self
@@ -340,29 +440,20 @@ class mongolizer_layer:
             #, srid = 4326
             ):
         """Konstruktor
-        vytvoří memory vrstvu z kolekce geojsonů v mongodb
-        počítá s mongem na localhostu
+        Create memory layer from geojsons stored in mongo
         :param collection: mongodb collection MongoClient().dbname.collectionname
-        :param query: dict s mongo dotazem na podmnožinu prvku, defaultně všechny
-        prvky z vrstvy
-        :param mustr_proprt: optional předloha properties se všemi slopupci,
-        které chci rozkouskovat do sloupců {Kod:1, Nazev:"eeee", Okres:{Kod:1}...
-        :param transform_proprt: optional přepis proprt do sloupců
-        :param geomcolname: subelement s geometrií, default geometry
+        :param query: dict with mongo querry loaded from geojson
+        default is all features from layer
+        :param geomcolname: name of sbdocument with geometry, default is geometry
+        it is for case when one feature has more then one geometry
         :param host: default localhost
         :param port: default 27017
         :param srid: default 4326
         :return: populated QgsVectorLayer
         """
 
-        #iniciuju rodicovskou tridu (i kdyz si nejsem uplne jistej,
-        #co to znamena
-        #QgsVectorLayer.__init__(self)
 
         self.vl = QgsVectorLayer()
-
-        #pripojim se na mongo
-        #collection = MongoClient(host, port)[dbname][collectionname]
 
         #geomcolname
         geomcolname = self.dockwidget.input_geom_coll.text()
@@ -374,7 +465,8 @@ class mongolizer_layer:
         if self.dockwidget.input_canvas_filter.checkState():
             spatial_query = {"$geoIntersects":
                 {"$geometry":
-                    json.loads(ogr.CreateGeometryFromWkt(self.iface.mapCanvas().extent().asWktPolygon()).ExportToJson())
+                    json.loads(ogr.CreateGeometryFromWkt(
+                        self.iface.mapCanvas().extent().asWktPolygon()).ExportToJson())
                 }
             }
             query[geomcolname] = spatial_query
@@ -382,37 +474,44 @@ class mongolizer_layer:
         #srid
         srid = self.dockwidget.input_srid.text()
         
-        #Stahnu vzorovej zaznam
+        #load first object for create table structures
         mustr = collection.find_one({geomcolname:{'$exists':1}})
 
-        #Nastavim providera na memory
-        self.vl.setDataSource(
-                '%s?crs=EPSG:%s' % (mustr[geomcolname]['type'], str(srid))
-                , collection.name
-                , 'memory')
+        #setting up provider
+        try:
+            self.vl.setDataSource(
+                    '%s?crs=EPSG:%s' % (mustr[geomcolname]['type'], str(srid))
+                    , collection.name
+                    , 'memory')
+        except TypeError:
+                QMessageBox.critical(QDialog()
+                        , "Missing geometry"
+                        , "First item of collection has no geometry.\n\
+                                Use query like {\"geometry\":{\"$exists\":1}}.\n\
+                                Check number of objects with geometry.")
+                return(None)
+
 
 
         #provider
         pr = self.vl.dataProvider()
          
-        #kosilka na datum
+        #ISO date template
         isisodate = re.compile('\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}')
 
-        #definuju atributy
+        #attrs deffinition
         pr.addAttributes(
             #ogc_fid    
             [QgsField('ogc_fid',QVariant.LongLong)] #LongLong have not proper length
-            #double taky ne, je treba pouzit def na numeric viz na dalsich mistech
-            #tagy z mustr.proprty
             + [QgsField(k
                 , 
                 #mongolizer_layer.qgs_attrtypedef(v)
                 (lambda i:
                     QVariant.Int if type(i) is int
-                    else QVariant.LongLong if type(i) is bson.int64.Int64 #nemusi se vejit do lonlong, melo by bejt number
+                    else QVariant.LongLong if type(i) is bson.int64.Int64 
                     else QVariant.Double if type(i) is float
-                    else QVariant.String if type(i) is dict #string co pude do jsona
-                    else QVariant.String if type(i) is list #string co pude do jsona
+                    else QVariant.String if type(i) is dict #string into json
+                    else QVariant.String if type(i) is list #string into json
                     else QVariant.Date if re.match(isisodate, i)
                     else QVariant.String
                     )(v)
@@ -421,7 +520,7 @@ class mongolizer_layer:
                 for k,v in mustr['properties'].iteritems() if type(v) is not NoneType]
         )
 
-        #aktualizuju definici vrstvy
+        #update layer definition
         self.vl.updateFields() 
 
         #limit
@@ -432,12 +531,12 @@ class mongolizer_layer:
                 , self.collection.find(query).count())
 
         for i in cur:
-            #vytvorim prvok
+            #create feature
             fet = QgsFeature()
 
-            #test, esli ma prvek geometrii
+            #test if feature has geometry
             if  geomcolname in i and type(i[geomcolname]) is not NoneType:
-                #pridam geometrii
+                #add geometry
                 fet.setGeometry(
                         QgsGeometry.fromWkt(
                             ogr.CreateGeometryFromJson(
@@ -446,15 +545,15 @@ class mongolizer_layer:
                             )
                         )
 
-            #zpracuju atributy
+            #process attrs
 
-            #chybejici sloupce
+            #missing colls
             missing_cols = {k:v for k,v in i['properties'].iteritems() 
                 if k not in 
                 [f.name() for f in self.vl.pendingFields()]}
 
             if missing_cols:
-                #pokud chybi sloupce, tak je pridam
+                #adding missing colls
                 pr.addAttributes(
                     [QgsField(k
                         , 
@@ -462,8 +561,8 @@ class mongolizer_layer:
                         (lambda i:
                             QVariant.Int if type(i) is int
                             else QVariant.Double if type(i) is float
-                            else QVariant.String if type(i) is dict #string co pude do jsona
-                            else QVariant.String if type(i) is list #string co pude do jsona
+                            else QVariant.String if type(i) is dict 
+                            else QVariant.String if type(i) is list 
                             else QVariant.LongLong if type(i) is bson.int64.Int64
                             else QVariant.Date if re.match(isisodate, i)
                             else QVariant.String
@@ -473,10 +572,10 @@ class mongolizer_layer:
                         for k,v in missing_cols.iteritems() if type(v) is not NoneType]
                 )
 
-                #aktualizuju definici vrstvy
+                #update layer def.
                 self.vl.updateFields() 
 
-            #naplnim atributy
+            #fill attributes
             fet.setAttributes(
                 map(lambda a: 
                     json.dumps(a, ensure_ascii=False) if (type(a) is dict or type(a) is list)
@@ -484,13 +583,11 @@ class mongolizer_layer:
                     else a,
                     (
                         [int(i['_id'])] #ogc_fid
-                        #proprty z mustru
+                        #properties from mustr
                         + [i['properties'][field.name()] 
                             if field.name() in i['properties'] else None
                             for field in self.vl.pendingFields() 
                             if field.name() not in ['ogc_fid']]
-                        #položky pro ktere nemam v datech misto
-                        #udelat tak, aby se pripadne doplnil sloupec
                     )
                 )
             )
