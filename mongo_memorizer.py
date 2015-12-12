@@ -264,8 +264,8 @@ class mongolizer_layer:
             self.dockwidget.input_canvas_filter.setEnabled(True)
         except: 
             self.dockwidget.input_canvas_filter.setEnabled(False)
-            QMessageBox.critical(QDialog()
-                    , "eee", "eeeeee")
+            #QMessageBox.critical(QDialog()
+            #        , "eee", "eeeeee")
 
 
     def mongo_memorize_execute(self):
