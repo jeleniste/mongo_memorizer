@@ -581,7 +581,8 @@ class mongolizer_layer:
                     else int(a) if type(a) is bson.int64.Int64
                     else a,
                     (
-                        [int(i['_id'])] #ogc_fid
+                        #[int(i['_id'])] #ogc_fid #because of object id, is not possible to transform it to int
+                        [str(i['_id'])] #ogc_fid
                         #properties from mustr
                         + [i['properties'][field.name()] 
                             if field.name() in i['properties'] else None
